@@ -4,7 +4,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_DICTIONARY_FILE: str = "etc/dictionary-usa.txt"
+DEFAULT_DICTIONARY_PATH: Path = Path("etc/dictionary-usa.txt")
 
 """Script that solves https://www.nytimes.com/puzzles/spelling-bee puzzles!"""
 
@@ -22,7 +22,7 @@ def acceptable_word(word: str, must_letter: str, may_letters: list[str]) -> bool
     return valid
 
 
-def solve_puzzle(must_letter: str, may_letters: str, dictionary_file: str = DEFAULT_DICTIONARY_FILE) -> list[str]:
+def solve_puzzle(must_letter: str, may_letters: str, dictionary_file: Path = DEFAULT_DICTIONARY_PATH) -> list[str]:
     dictionary_path = Path(dictionary_file)
     if not dictionary_path.exists():
         raise RuntimeError(f"Dictionary file: '{dictionary_path}' does not exist")
@@ -58,8 +58,9 @@ def main() -> None:
     parser.add_argument(
         "--dictionary-file",
         "-df",
-        default=DEFAULT_DICTIONARY_FILE,
-        help=f"The dictionary text file to use. One word per line. Default: {DEFAULT_DICTIONARY_FILE}",
+        type=Path,
+        default=DEFAULT_DICTIONARY_PATH,
+        help=f"The dictionary text file to use. One word per line. Default: {DEFAULT_DICTIONARY_PATH}",
     )
 
     parser.add_argument(

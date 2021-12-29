@@ -3,7 +3,8 @@ import typing
 from pathlib import Path
 
 import pytest
-from python_sandbox.spelling_bee import solve_puzzle
+
+from pysandbox.spelling_bee import solve_puzzle
 
 TEST_DICTIONARY: list[str] = [
     "apple",
