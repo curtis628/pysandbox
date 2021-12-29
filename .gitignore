@@ -1,2 +1,4 @@
 .tox
 tcurtis.pysandbox.egg-info
+.coverage
+htmlcov
