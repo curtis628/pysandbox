@@ -2,6 +2,7 @@
 
 [![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+[![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 
 This repo can be a helpful example for how to package, test and run a collection
 of python files. It requires `python3.9+` and `tox`.
@@ -34,3 +35,4 @@ source .tox/py39/bin/activate.fish
 * [isort](https://github.com/PyCQA/isort) - sorts import statements
 * [black](https://github.com/psf/black) - the uncompromising Python code formatter
 * [flake8](https://github.com/PyCQA/flake8) - checks Python code style and quality
+* [mypy](https://mypy.readthedocs.io/en/stable/) - static type checker for Python code

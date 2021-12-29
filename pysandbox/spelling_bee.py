@@ -4,12 +4,12 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_DICTIONARY_FILE = "etc/dictionary-usa.txt"
+DEFAULT_DICTIONARY_FILE: str = "etc/dictionary-usa.txt"
 
 """Script that solves https://www.nytimes.com/puzzles/spelling-bee puzzles!"""
 
 
-def acceptable_word(word: str, must_letter: str, may_letters: list[str]):
+def acceptable_word(word: str, must_letter: str, may_letters: list[str]) -> bool:
     if len(word) < 4:
         return False
     acceptable_letters = [must_letter] + may_letters
@@ -22,7 +22,7 @@ def acceptable_word(word: str, must_letter: str, may_letters: list[str]):
     return valid
 
 
-def solve_puzzle(must_letter: str, may_letters: str, dictionary_file: str = DEFAULT_DICTIONARY_FILE):
+def solve_puzzle(must_letter: str, may_letters: str, dictionary_file: str = DEFAULT_DICTIONARY_FILE) -> list[str]:
     dictionary_path = Path(dictionary_file)
     if not dictionary_path.exists():
         raise RuntimeError(f"Dictionary file: '{dictionary_path}' does not exist")
@@ -50,7 +50,7 @@ def solve_puzzle(must_letter: str, may_letters: str, dictionary_file: str = DEFA
     return words
 
 
-def main():
+def main() -> None:
     logging.basicConfig(level=logging.DEBUG)
     logging.debug("Logging initialized")
 
