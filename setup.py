@@ -14,6 +14,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=find_packages(exclude=["*.tests"]),
+    package_data={ "": ["*.txt"], },
     install_requires=["tox"],
     classifiers=["Programming Language :: Python :: 3.9+", "Operating System :: OS Independent"],
     entry_points={
