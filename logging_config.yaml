@@ -1,0 +1,24 @@
+version: 1
+disable_existing_loggers: false
+formatters:
+    prettyFormatter:
+        format: '%(asctime)s %(filename)-20.20s [%(levelname)8s] - %(message)s'
+        datefmt: '%Y/%m/%d %H:%M:%S'
+loggers:
+    pysandbox:
+        level: DEBUG
+        handlers: [console]
+        propagate: false
+    __main__:
+        level: DEBUG
+        handlers: [console]
+        propagate: false
+handlers:
+    console:
+        class: logging.StreamHandler
+        formatter: prettyFormatter
+        level: DEBUG
+        stream: ext://sys.stdout
+root:
+    level: WARN
+    handlers: [console]
