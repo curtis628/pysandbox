@@ -6,7 +6,12 @@ import pytest
 import responses
 
 from pysandbox.common_test import mock_response_from_file
-from pysandbox.nflpickem.picker import ENV_API_TOKEN, GET_ODDS_URL, _call_odds_api, main
+from pysandbox.nflpickem.picker import (
+    ENV_API_TOKEN,
+    GET_ODDS_URL,
+    _call_odds_api,
+    generate_picks,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -38,7 +43,7 @@ def test_call_odds_api(mock_response: Any) -> None:
 @responses.activate
 def test_e2e(mock_today: date, mock_response: Any) -> None:
     os.environ[ENV_API_TOKEN] = "mock-api-token"
-    sorted_games = main(mock_today)
+    sorted_games = generate_picks(mock_today)
     assert len(sorted_games) == 15
 
     # ensure games are in sorted order

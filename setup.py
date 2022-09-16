@@ -19,7 +19,7 @@ setup(
     classifiers=["Programming Language :: Python :: 3.9+", "Operating System :: OS Independent"],
     entry_points={
         "console_scripts": [
-            "nflpicker-gen = pysandbox.nflpicker:main",
+            "nflpicker-gen = pysandbox.nflpickem.picker:main",
             "spelling-bee = pysandbox.spelling_bee:main",
         ]
     },

@@ -49,6 +49,7 @@ def _call_odds_api() -> list[GameType]:
     response.raise_for_status()
     logger.debug(f"GET {GET_ODDS_URL} returned {response}")
     games_json: list[GameType] = response.json()
+    logger.info(f"Retrieved recent data for {len(games_json)} games from {GET_ODDS_URL}")
     return games_json
 
 
@@ -72,7 +73,7 @@ def _filter_games(games_json: list[GameType], today: date) -> list[GameType]:
     return include_games
 
 
-def main(today_input: Optional[date] = None) -> list[Game]:
+def generate_picks(today_input: Optional[date] = None) -> list[Game]:
     # makes unit testing easier if we can mock what day it is...
     today: date = today_input if today_input else date.today()
 
@@ -80,7 +81,6 @@ def main(today_input: Optional[date] = None) -> list[Game]:
     logger.level = logging.INFO
     games_json: list[GameType] = _call_odds_api()
     games_list = list()
-    logger.info(f"Retrieved data for {len(games_json)} games")
 
     # filter out games that are after Monday...
     filtered_games = _filter_games(games_json, today)
@@ -96,7 +96,7 @@ def main(today_input: Optional[date] = None) -> list[Game]:
         away_points = 0.0
 
         for bm in bookmakers:
-            logger.debug(f"         {bm['title']:20} as of {bm['last_update']}")
+            # logger.debug(f"         {bm['title']:20} as of {bm['last_update']}")
             spread_markets = [market for market in bm["markets"] if market["key"] == "spreads"]
             spread_market = spread_markets[0]
             for outcome in spread_market["outcomes"]:
@@ -109,13 +109,17 @@ def main(today_input: Optional[date] = None) -> list[Game]:
         away_avg = away_points / len(bookmakers)
         game_obj = Game(home_team, home_avg, away_team, away_avg, start_time)
         games_list.append(game_obj)
-        logger.debug(f"   {game_obj}")
+        logger.debug(f"      {game_obj}")
 
     games_list.sort(key=lambda game: abs(game.home_spread_avg), reverse=True)
     for ndx, sorted_game in enumerate(games_list):
         logger.info(f"Game {ndx+1:2}: {sorted_game}")
 
     return games_list
+
+
+def main() -> None:
+    generate_picks()
 
 
 if __name__ == "__main__":

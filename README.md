@@ -5,7 +5,7 @@
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 
 This repo can be a helpful example for how to package, test and run a collection
-of python files. It requires `python3.9+` and `tox`.
+of python files. It requires `python3.10+` and `tox`.
 
 Run the following to clone, build, test and package everything.
 
@@ -19,12 +19,13 @@ If you want to run some of the scripts from the command line after building,
 run:
 
 ```shell
-source .tox/py39/bin/activate.fish
+source .tox/py310/bin/activate.fish
 ```
 
 ## Included Scripts
 
 * `spelling-bee`: solves the New York Times' [spelling-bee game](https://www.nytimes.com/puzzles/spelling-bee)
+* `nflpicker-gen`: recommends picks for [my NFL pickem league](https://www.runyourpool.com/nfl/pickem/), using [the-odds-api](https://the-odds-api.com/)
 
 ## Libraries Used
 
