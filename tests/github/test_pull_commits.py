@@ -33,7 +33,7 @@ pull_commits.DEFAULT_PER_PAGE = TEST_PER_PAGE
 def _mock_response_from_file(filename: str) -> Any:
     """Returns decoded JSON from `filename`"""
     this_file = sys.modules[__name__].__file__
-    this_file_path = Path(this_file)
+    this_file_path = Path(this_file)  # type: ignore
     mock_1_file = this_file_path.parent / filename
     with mock_1_file.open() as f:
         response = json.load(f)
@@ -69,7 +69,7 @@ def mock_responses(multi_call_first_link: str) -> Any:
     return responses
 
 
-@responses.activate  # type: ignore
+@responses.activate
 def test_single_call(single_call_first_link: str, mock_response: Any) -> None:
     actual = pull_commits.pull_commits(OWNER, REPO, TEST_PER_PAGE)
     assert len(actual) == TEST_PER_PAGE
@@ -81,7 +81,7 @@ def test_single_call(single_call_first_link: str, mock_response: Any) -> None:
     assert mock_response.calls[0].request.url == single_call_first_link
 
 
-@responses.activate  # type: ignore
+@responses.activate
 def test_multi_call(multi_call_first_link: str, mock_responses: Any) -> None:
     actual = pull_commits.pull_commits(OWNER, REPO, 10)
     assert len(actual) == 10
