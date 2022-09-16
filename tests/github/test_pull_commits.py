@@ -1,13 +1,10 @@
-import json
-import sys
-from pathlib import Path
 from typing import Any
 
 import pytest
 import responses
 
 import pysandbox.github.pull_commits as pull_commits
-from pysandbox.common_test import run_and_expect
+from pysandbox.common_test import mock_response_from_file, run_and_expect
 
 EXPECTED_PAGE_2_LINK = "https://api.github.com/repositories/1362490/commits?per_page=4&page=2"
 EXPECTED_PAGE_3_LINK = "https://api.github.com/repositories/1362490/commits?per_page=4&page=3"
@@ -30,16 +27,6 @@ TEST_PER_PAGE = 4
 pull_commits.DEFAULT_PER_PAGE = TEST_PER_PAGE
 
 
-def _mock_response_from_file(filename: str) -> Any:
-    """Returns decoded JSON from `filename`"""
-    this_file = sys.modules[__name__].__file__
-    this_file_path = Path(this_file)  # type: ignore
-    mock_1_file = this_file_path.parent / filename
-    with mock_1_file.open() as f:
-        response = json.load(f)
-    return response
-
-
 @pytest.fixture
 def single_call_first_link() -> str:
     return f"{pull_commits.GIT_BASE_URL}/repos/{OWNER}/{REPO}/commits?per_page={TEST_PER_PAGE}"
@@ -47,7 +34,7 @@ def single_call_first_link() -> str:
 
 @pytest.fixture
 def mock_response(single_call_first_link: str) -> Any:
-    page_1 = _mock_response_from_file("mock_page_1.json")
+    page_1 = mock_response_from_file("github/mock_page_1.json")
     responses.add(responses.GET, single_call_first_link, json=page_1, status=200, headers={"Link": PAGE_1_HEADER})
     return responses
 
@@ -59,9 +46,9 @@ def multi_call_first_link() -> str:
 
 @pytest.fixture
 def mock_responses(multi_call_first_link: str) -> Any:
-    page_1 = _mock_response_from_file("mock_page_1.json")
-    page_2 = _mock_response_from_file("mock_page_2.json")
-    page_3 = _mock_response_from_file("mock_page_3.json")
+    page_1 = mock_response_from_file("github/mock_page_1.json")
+    page_2 = mock_response_from_file("github/mock_page_2.json")
+    page_3 = mock_response_from_file("github/mock_page_3.json")
 
     responses.add(responses.GET, multi_call_first_link, json=page_1, status=200, headers={"Link": PAGE_1_HEADER})
     responses.add(responses.GET, EXPECTED_PAGE_2_LINK, json=page_2, status=200, headers={"Link": PAGE_2_HEADER})

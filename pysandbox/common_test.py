@@ -2,8 +2,10 @@
 # Helpful, reusable logic across many test scripts
 #
 
+import json
 import sys
-from typing import Callable, Optional, Type
+from pathlib import Path
+from typing import Any, Callable, Optional, Type
 
 import pytest
 
@@ -32,3 +34,16 @@ def run_and_expect(
             assert excinfo.value.code == 0
     else:
         run_with_argv(method, test_argv)
+
+
+def mock_response_from_file(filename: str) -> Any:
+    """Returns decoded JSON from `filename`"""
+    import pdb
+
+    pdb.set_trace
+    this_file = sys.modules[__name__].__file__
+    this_file_path = Path(this_file)  # type: ignore
+    mock_1_file = this_file_path.parent.parent / "tests" / filename
+    with mock_1_file.open() as f:
+        response = json.load(f)
+    return response

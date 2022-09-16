@@ -1,15 +1,19 @@
+"""Automates my runyourpool NFL picks using spreads from the-odds-api"""
+
 import logging
 import os
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
+from typing import Any, Optional
 from zoneinfo import ZoneInfo
-from typing import Any
+
 import requests
 
 import pysandbox.common as common
 
 # See: https://the-odds-api.com/liveapi/guides/v4/#overview
 ENV_API_TOKEN = "ODDS_API_KEY"
+GET_ODDS_URL = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds"
 PDT = ZoneInfo("America/Los_Angeles")
 
 """Represents the JSON coming from the-odds-api that represents a game."""
@@ -21,6 +25,7 @@ logger = logging.getLogger(__name__)
 @dataclass(frozen=True)
 class Game:
     """Represents a summarized view of a upcoming game"""
+
     home_team: str
     home_spread_avg: float
     away_team: str
@@ -35,6 +40,18 @@ class Game:
         return f"Game: {self.away_team:22} {away_avg}  @  {self.home_team:22} {home_avg} [{start_time_str}]"
 
 
+def _call_odds_api() -> list[GameType]:
+    if ENV_API_TOKEN not in os.environ:
+        raise Exception(f"'{ENV_API_TOKEN}' not found in environment variables.")
+
+    params = {"apiKey": os.environ[ENV_API_TOKEN], "regions": "us", "oddsFormat": "american", "markets": "spreads"}
+    response = requests.get(GET_ODDS_URL, params=params)
+    response.raise_for_status()
+    logger.debug(f"GET {GET_ODDS_URL} returned {response}")
+    games_json: list[GameType] = response.json()
+    return games_json
+
+
 def _parse_start_time(game: GameType) -> datetime:
     """Parses the `game`'s (the-odds-api Game API object) start time, returning a timezone-aware date"""
     start_time_str = game["commence_time"]
@@ -42,9 +59,8 @@ def _parse_start_time(game: GameType) -> datetime:
     return datetime.fromisoformat(start_time_str)
 
 
-def _filter_games(games_json: list[GameType]) -> list[GameType]:
+def _filter_games(games_json: list[GameType], today: date) -> list[GameType]:
     """Filter out any games that take place after the upcoming Monday."""
-    today = date.today()
     days_until_monday = 7 - today.weekday()  # NOTE: Monday == 0 for datetime.weekday()
     next_monday = today + timedelta(days=days_until_monday)
 
@@ -56,23 +72,18 @@ def _filter_games(games_json: list[GameType]) -> list[GameType]:
     return include_games
 
 
-def main() -> None:
+def main(today_input: Optional[date] = None) -> list[Game]:
+    # makes unit testing easier if we can mock what day it is...
+    today: date = today_input if today_input else date.today()
+
     common.initialize_logging_from_file()
     logger.level = logging.INFO
-    if ENV_API_TOKEN not in os.environ:
-        raise Exception(f"'{ENV_API_TOKEN}' not found in environment variables.")
-
-    url = "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds"
-    params = {"apiKey": os.environ[ENV_API_TOKEN], "regions": "us", "oddsFormat": "american", "markets": "spreads"}
-    response = requests.get(url, params=params)
-    response.raise_for_status()
-    logger.debug(f"GET {url} returned {response}")
-    games_json: list[GameType] = response.json()
+    games_json: list[GameType] = _call_odds_api()
     games_list = list()
     logger.info(f"Retrieved data for {len(games_json)} games")
 
     # filter out games that are after Monday...
-    filtered_games = _filter_games(games_json)
+    filtered_games = _filter_games(games_json, today)
 
     for game in filtered_games:
         home_team = game["home_team"]
@@ -103,6 +114,8 @@ def main() -> None:
     games_list.sort(key=lambda game: abs(game.home_spread_avg), reverse=True)
     for ndx, sorted_game in enumerate(games_list):
         logger.info(f"Game {ndx+1:2}: {sorted_game}")
+
+    return games_list
 
 
 if __name__ == "__main__":
